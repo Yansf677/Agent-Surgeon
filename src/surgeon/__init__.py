@@ -1,4 +1,4 @@
-from .hooks import AutoGenTraceBridge, LangChainTraceHandler, OpenAIAgentsTracer
+from .hooks import AutoGenTraceBridge, LangChainTraceHandler, OpenAITracePatch, OpenAIAgentsTracer, patch_openai_client
 from .insights import DeadLoopError, LoopGuard, build_comparison, estimate_cost_usd, estimate_usage, flatten_text
 from .storage import TraceStore
 from .tracer import TraceRecorder, surgeon
@@ -9,6 +9,7 @@ __all__ = [
     "DeadLoopError",
     "LangChainTraceHandler",
     "LoopGuard",
+    "OpenAITracePatch",
     "OpenAIAgentsTracer",
     "TraceRecorder",
     "TraceStore",
@@ -17,5 +18,6 @@ __all__ = [
     "estimate_usage",
     "export_html_report",
     "flatten_text",
+    "patch_openai_client",
     "surgeon",
 ]

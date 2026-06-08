@@ -255,3 +255,24 @@ The demo now includes:
 - a deliberate loop guard tripwire
 - token and cost annotations in the replay UI
 
+---
+
+## New in v0.4
+
+### Real framework interception
+
+The MVP now goes beyond simulated callbacks:
+
+- `LangChainTraceHandler` plugs into real LangChain callback flow
+- `patch_openai_client(...)` monkey-patches a real OpenAI Python SDK client
+- the demo uses `httpx.MockTransport`, so the OpenAI SDK path runs end-to-end **without** a real API key or network dependency
+
+### Why this matters
+
+This means Agent-Surgeon can now trace *actual framework traffic*, not just toy wrappers:
+
+- real callback lifecycles
+- real request / response payload interception
+- real token / cost annotation on SDK-shaped responses
+- real diff previews between model input and output
+
