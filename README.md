@@ -276,3 +276,32 @@ This means Agent-Surgeon can now trace *actual framework traffic*, not just toy 
 - real token / cost annotation on SDK-shaped responses
 - real diff previews between model input and output
 
+---
+
+## Quickstart: one-line integration
+
+### OpenAI SDK
+
+```python
+from openai import OpenAI
+from surgeon import patch_openai_client
+
+client = patch_openai_client(OpenAI())
+```
+
+### LangChain
+
+```python
+from surgeon import LangChainTraceHandler
+
+callbacks = [LangChainTraceHandler()]
+```
+
+### Streaming included
+
+Streaming tokens are now traced too:
+
+- OpenAI SDK `stream=True` chunks are intercepted and reassembled
+- LangChain `on_llm_new_token` callbacks are captured live
+- final replay includes token usage, diff preview, and streamed output context
+

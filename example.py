@@ -6,8 +6,8 @@ import time
 
 import httpx
 from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_core.messages import AIMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
+from langchain_core.messages import AIMessage, AIMessageChunk
+from langchain_core.outputs import ChatGeneration, ChatGenerationChunk, ChatResult
 from langchain_core.prompts import ChatPromptTemplate
 from openai import OpenAI
 
@@ -26,6 +26,16 @@ class DemoLangChainModel(BaseChatModel):
         joined = "\n".join(getattr(message, "content", "") for message in messages)
         reply = self.scripted_response + "\nObserved prompt:\n" + joined[:120]
         return ChatResult(generations=[ChatGeneration(message=AIMessage(content=reply))])
+
+    def _stream(self, messages, stop=None, run_manager=None, **kwargs):
+        joined = "\n".join(getattr(message, "content", "") for message in messages)
+        tokens = ["Search competitors, ", "estimate upside, ", "then summarize risk. ", "Prompt: ", joined[:60]]
+        for token in tokens:
+            chunk = ChatGenerationChunk(message=AIMessageChunk(content=token))
+            if run_manager is not None:
+                run_manager.on_llm_new_token(token, chunk=chunk)
+            time.sleep(0.02)
+            yield chunk
 
 
 @surgeon.trace(metadata={"lane": "classic_decorator"})
@@ -88,16 +98,17 @@ def simulate_loop_guard() -> dict:
 
 def _mock_openai_handler(request: httpx.Request) -> httpx.Response:
     body = json.loads(request.content.decode("utf-8"))
+    if request.url.path.endswith("/chat/completions") and body.get("stream"):
+        stream_body = "".join([
+            "data: " + json.dumps({"id": "chatcmpl-stream-001", "object": "chat.completion.chunk", "created": 1710000001, "model": body.get("model", "gpt-4o-mini"), "choices": [{"index": 0, "delta": {"content": "Use the bundle test "}, "finish_reason": None}]}) + "\n\n",
+            "data: " + json.dumps({"id": "chatcmpl-stream-001", "object": "chat.completion.chunk", "created": 1710000001, "model": body.get("model", "gpt-4o-mini"), "choices": [{"index": 0, "delta": {"content": "and keep a human on the approval step."}, "finish_reason": None}]}) + "\n\n",
+            "data: " + json.dumps({"id": "chatcmpl-stream-001", "object": "chat.completion.chunk", "created": 1710000001, "model": body.get("model", "gpt-4o-mini"), "choices": [{"index": 0, "delta": {}, "finish_reason": "stop"}], "usage": {"prompt_tokens": 131, "completion_tokens": 29, "total_tokens": 160}}) + "\n\n",
+            "data: [DONE]\n\n",
+        ])
+        return httpx.Response(200, headers={"content-type": "text/event-stream"}, content=stream_body)
     if request.url.path.endswith("/chat/completions"):
         message = body.get("messages", [{}])[-1].get("content", "")
-        payload = {
-            "id": "chatcmpl-mock-001",
-            "object": "chat.completion",
-            "created": 1710000000,
-            "model": body.get("model", "gpt-4o-mini"),
-            "choices": [{"index": 0, "message": {"role": "assistant", "content": "Use the bundle test and keep a human on the approval step. Prompt was: {}".format(message)}, "finish_reason": "stop"}],
-            "usage": {"prompt_tokens": 131, "completion_tokens": 29, "total_tokens": 160},
-        }
+        payload = {"id": "chatcmpl-mock-001", "object": "chat.completion", "created": 1710000000, "model": body.get("model", "gpt-4o-mini"), "choices": [{"index": 0, "message": {"role": "assistant", "content": "Use the bundle test and keep a human on the approval step. Prompt was: {}".format(message)}, "finish_reason": "stop"}], "usage": {"prompt_tokens": 131, "completion_tokens": 29, "total_tokens": 160}}
         return httpx.Response(200, json=payload)
     return httpx.Response(404, json={"error": {"message": "mock route missing"}})
 
@@ -105,25 +116,26 @@ def _mock_openai_handler(request: httpx.Request) -> httpx.Response:
 def simulate_openai_sdk_call(user_goal: str) -> str:
     client = OpenAI(api_key="demo-key", base_url="https://api.openai.com/v1", http_client=httpx.Client(transport=httpx.MockTransport(_mock_openai_handler)))
     patcher = patch_openai_client(client, recorder=surgeon)
+    collected = []
     try:
-        response = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role": "system", "content": "You are a growth copilot."}, {"role": "user", "content": user_goal}])
-        return response.choices[0].message.content or ""
+        stream = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role": "system", "content": "You are a growth copilot."}, {"role": "user", "content": user_goal}], stream=True)
+        for chunk in stream:
+            if chunk.choices and chunk.choices[0].delta.content:
+                collected.append(chunk.choices[0].delta.content)
+        return "".join(collected)
     finally:
         patcher.unpatch()
 
 
 def simulate_langchain_call(user_goal: str) -> str:
     handler = LangChainTraceHandler(recorder=surgeon)
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are a growth strategist that explains tradeoffs clearly."),
-        ("human", "Goal: {goal}"),
-    ])
+    prompt = ChatPromptTemplate.from_messages([("system", "You are a growth strategist that explains tradeoffs clearly."), ("human", "Goal: {goal}")])
     model = DemoLangChainModel()
     chain = prompt | model
-    result = chain.invoke({"goal": user_goal}, config={"callbacks": [handler], "run_name": "growth_research_chain"})
-    if isinstance(result, AIMessage):
-        return result.content
-    return str(result)
+    chunks = []
+    for chunk in chain.stream({"goal": user_goal}, config={"callbacks": [handler], "run_name": "growth_research_chain"}):
+        chunks.append(getattr(chunk, "content", str(chunk)))
+    return "".join(chunks)
 
 
 def simulate_autogen_bridge(user_goal: str) -> None:
@@ -168,15 +180,7 @@ def run_agent(user_goal: str) -> dict:
         final_answer = "Recommend the bundle launch, but flag missing internal notes for manual review."
         synthesis.set_result({"final_answer": final_answer, "confidence": "high", "langchain": langchain_result[:120], "openai": openai_result[:120]})
 
-    return {
-        "steps": steps,
-        "search": search_result,
-        "calculator": calc_result,
-        "notes": notes_result,
-        "langchain": langchain_result,
-        "openai_sdk": openai_result,
-        "final_answer": final_answer,
-    }
+    return {"steps": steps, "search": search_result, "calculator": calc_result, "notes": notes_result, "langchain": langchain_result, "openai_sdk_stream": openai_result, "final_answer": final_answer}
 
 
 def main() -> None:
