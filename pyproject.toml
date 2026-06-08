@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-surgeon"
+version = "0.3.0"
+description = "Time-travel debugging for your LLM agents"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+  {name = "Agent-Surgeon contributors"}
+]
+dependencies = [
+  "rich>=13.7.1"
+]
+keywords = ["ai-agent", "debugger", "observability", "llm", "tracing", "langchain", "autogen", "token-tracking"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+]
+
+[project.scripts]
+surgeon-view = "surgeon.viewer:main"
+surgeon-web = "surgeon.web:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
