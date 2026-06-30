@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "agent-surgeon"
 version = "0.4.0"
-description = "Time-travel debugging for your LLM agents"
+description = "Time-travel debugging for your LLM agents — trace, replay, and understand agent failures with one decorator."
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}
@@ -18,7 +18,20 @@ dependencies = [
   "openai>=1.30.0",
   "langchain-core>=0.2.30"
 ]
-keywords = ["ai-agent", "debugger", "observability", "llm", "tracing", "langchain", "openai", "autogen", "token-tracking"]
+keywords = [
+  "ai-agent",
+  "debugger",
+  "observability",
+  "llm",
+  "tracing",
+  "langchain",
+  "openai",
+  "autogen",
+  "token-tracking",
+  "agent-debugging",
+  "time-travel-debugging",
+  "llm-ops"
+]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
@@ -26,8 +39,18 @@ classifiers = [
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11"
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Debuggers",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence"
 ]
+
+[project.urls]
+Homepage = "https://github.com/anthropic-agents/agent-surgeon"
+Repository = "https://github.com/anthropic-agents/agent-surgeon"
+Issues = "https://github.com/anthropic-agents/agent-surgeon/issues"
+Documentation = "https://github.com/anthropic-agents/agent-surgeon#-quick-start"
 
 [project.scripts]
 surgeon-view = "surgeon.viewer:main"

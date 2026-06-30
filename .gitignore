@@ -1,8 +1,31 @@
+# Python
 __pycache__/
 *.pyc
-.venv/
-.surgeon/
-.dist/
-build/
+*.pyo
 *.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Agent-Surgeon trace data
+.surgeon/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
