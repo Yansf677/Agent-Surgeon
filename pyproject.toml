@@ -47,10 +47,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/anthropic-agents/agent-surgeon"
-Repository = "https://github.com/anthropic-agents/agent-surgeon"
-Issues = "https://github.com/anthropic-agents/agent-surgeon/issues"
-Documentation = "https://github.com/anthropic-agents/agent-surgeon#-quick-start"
+Homepage = "https://github.com/Yansf677/Agent-Surgeon"
+Repository = "https://github.com/Yansf677/Agent-Surgeon"
+Issues = "https://github.com/Yansf677/Agent-Surgeon/issues"
+Documentation = "https://github.com/Yansf677/Agent-Surgeon#-quick-start"
 
 [project.scripts]
 surgeon-view = "surgeon.viewer:main"

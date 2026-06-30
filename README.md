@@ -13,7 +13,7 @@
   <a href="https://pypi.org/project/agent-surgeon/"><img src="https://img.shields.io/pypi/v/agent-surgeon?color=blue&logo=pypi&logoColor=white" alt="PyPI Version"/></a>
   <a href="https://pypi.org/project/agent-surgeon/"><img src="https://img.shields.io/pypi/pyversions/agent-surgeon?logo=python&logoColor=white" alt="Python Versions"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License: MIT"/></a>
-  <a href="https://github.com/anthropic-agents/agent-surgeon/stargazers"><img src="https://img.shields.io/github/stars/anthropic-agents/agent-surgeon?style=social" alt="GitHub Stars"/></a>
+  <a href="https://github.com/Yansf677/Agent-Surgeon/stargazers"><img src="https://img.shields.io/github/stars/Yansf677/Agent-Surgeon?style=social" alt="GitHub Stars"/></a>
 </p>
 
 <p align="center">
@@ -179,7 +179,7 @@ conv = bridge.on_conversation_start(
 Run the full demo yourself:
 
 ```bash
-git clone https://github.com/anthropic-agents/agent-surgeon.git
+git clone https://github.com/Yansf677/Agent-Surgeon.git
 cd agent-surgeon
 pip install -e .
 python example.py

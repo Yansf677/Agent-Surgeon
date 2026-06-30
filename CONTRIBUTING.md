@@ -8,7 +8,7 @@ Agent-Surgeon is intentionally small, focused, and opinionated. We love contribu
 
 ### 🐛 Bug Reports
 
-Found something broken? [Open an issue](https://github.com/anthropic-agents/agent-surgeon/issues/new?template=bug_report.md) with:
+Found something broken? [Open an issue](https://github.com/Yansf677/Agent-Surgeon/issues/new?template=bug_report.md) with:
 
 - What you expected to happen
 - What actually happened
@@ -17,7 +17,7 @@ Found something broken? [Open an issue](https://github.com/anthropic-agents/agen
 
 ### 💡 Feature Requests
 
-Have an idea? [Open an issue](https://github.com/anthropic-agents/agent-surgeon/issues/new?template=feature_request.md) and describe:
+Have an idea? [Open an issue](https://github.com/Yansf677/Agent-Surgeon/issues/new?template=feature_request.md) and describe:
 
 - The problem you're solving
 - Your proposed solution
@@ -51,7 +51,7 @@ Look at `src/surgeon/hooks.py` for the pattern. Each adapter should:
 ## Development Setup
 
 ```bash
-git clone https://github.com/anthropic-agents/agent-surgeon.git
+git clone https://github.com/Yansf677/Agent-Surgeon.git
 cd agent-surgeon
 python3 -m venv .venv
 source .venv/bin/activate
